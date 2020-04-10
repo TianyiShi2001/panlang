@@ -8,9 +8,17 @@ test("octave disp('hello')", () => {
   });
 });
 
+const { perl } = ENGINES.perl;
+
+test("perl print 'hello'", () => {
+  return perl("print 'hello'").then((res) => {
+    expect(res.output).toBe("hello");
+  });
+});
+
 const { ruby } = ENGINES.ruby;
 
-test("ruby puts hello", () => {
+test("ruby puts 'hello'", () => {
   return ruby("puts 'hello'").then((res) => {
     expect(res.output).toBe("hello");
   });

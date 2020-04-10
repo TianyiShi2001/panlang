@@ -1,7 +1,7 @@
 import re
 import json
 
-engines_file = "../src/Engine.ts"
+engines_file = "../src/generic/engines.ts"
 with open(engines_file) as f:
     engines_file_content = f.read()
 

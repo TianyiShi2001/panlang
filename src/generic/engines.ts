@@ -18,10 +18,20 @@ export const ENGINE_ALIASES = {
   "*": "generic",
 };
 
-type Engine = (code: string) => Promise<Result>;
+enum EngineType {
+  EVAL,
+  COMPILE,
+  REPL,
+  OTHER,
+}
+
+interface Engine {
+  (code: string): Promise<Result>;
+  $type?: EngineType;
+}
 
 function EvalFromStringEngine(command: string, args: string[] | string, message?: string): Engine {
-  return async (code) => {
+  let engine: Engine = async (code) => {
     args = Array.isArray(args) ? args : [args];
     let res = {} as Result;
     res.message = message || `running: ${command} ${args.join(" ")}`;
@@ -34,6 +44,8 @@ function EvalFromStringEngine(command: string, args: string[] | string, message?
     }
     return res;
   };
+  engine.$type = EngineType.EVAL;
+  return engine;
 }
 
 // JS
@@ -77,10 +89,10 @@ function CompileAndEvalEngine(command: string, ext: string, buildOpt?: string, o
       try {
         res.output = (await execa(bin)).stdout; // binary output
       } catch (e) {
-        res.error = e.stderr ? e.stderr : e.shortMessage;
+        res.error = e.stderr || e.shortMessage;
       }
     } catch (e) {
-      res.error = e.stderr ? e.stderr : e.shortMessage;
+      res.error = e.stderr || e.shortMessage;
     } finally {
       try {
         fs.unlinkSync(src);
